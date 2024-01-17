@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Invoice Template</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 0;
+    }
+
+    .header {
+      background-color: #007bff;
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .invoice-section {
+      width: 90%; /* Adjusted width for smaller screens */
+      margin: 20px auto;
+      background-color: #fff;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+      font-size: 16px; /* Default font size for web display */
+    }
+
+    /* Additional styles for PDF generation */
+    @media print {
+      .invoice-section {
+        font-size: 80px; /* Larger font size for PDF */
+      }
+      /* Other styles for PDF print can be added here */
+    }
+
+    .recipient-details {
+      margin-bottom: 20px;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 10px;
+    }
+
+    .recipient-details h2 {
+      margin-bottom: 5px;
+      font-size: 18px; /* Adjusted font size */
+      color: #333;
+    }
+
+    .recipient-details p {
+      margin: 0;
+      color: #666;
+    }
+
+    .product-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+      font-size: 14px; /* Adjusted font size */
+    }
+
+    .product-table th,
+    .product-table td {
+      border: 1px solid #ddd;
+      padding: 8px; /* Adjusted padding */
+      text-align: left;
+    }
+
+    .product-table th {
+      background-color: #f5f5f5;
+    }
+
+    .total-row td {
+      text-align: right;
+      font-weight: bold;
+    }
+
+    .total-row {
+      border-top: 2px solid #ddd;
+    }
+
+    .bold {
+      font-weight: bold;
+    }
+
+    .heading1 {
+      font-size: 30px; /* Adjusted font size */
+      margin: 0;
+    }
+
+    .thank-you {
+      margin-top: 20px;
+      text-align: center;
+      font-style: italic;
+      color: #555;
+      font-size: 14px; /* Adjusted font size */
+    }
+
+    /* Adjustments for smaller screens */
+    @media (max-width: 768px) {
+      .invoice-section {
+        width: 100%;
+        border-radius: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="invoice">
+    <div class="header">
+      <p class="heading1">Stylish Company Name</p>
+      <p>Company Address | Phone: +1234567890 | GST Number: ABCDE12345</p>
+    </div>
+
+    <div class="invoice-section">
+      <div class="recipient-details">
+        <p class="bold">Bill To:</p>
+        <p>Recipient Name</p>
+        <p>Recipient Address</p>
+        <p>Phone: +9876543210</p>
+        <p>Bill Number: #12345 | Issue Date: January 7, 2024</p>
+      </div>
+
+      <table class="product-table">
+        <thead>
+          <tr>
+            <th>SR #</th>
+            <th>Wax</th>
+            <th>Quantity</th>
+            <th>Price</th>
+            <th>Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>Product A</td>
+            <td>5</td>
+            <td>$50</td>
+            <td>$250</td>
+          </tr>
+          <!-- Other rows -->
+        </tbody>
+        <tfoot>
+          <tr class="total-row">
+            <td colspan="4">SGST (9%):</td>
+            <td>$XXX</td> <!-- Total Amount -->
+          </tr>
+          <tr class="total-row">
+            <td colspan="4">CGST (9%):</td>
+            <td>$XXX</td> <!-- Total Amount -->
+          </tr>
+          <tr class="total-row">
+            <td colspan="4">Total:</td>
+            <td>$XXX</td> <!-- Total Amount -->
+          </tr>
+        </tfoot>
+      </table>
+      <div class="thank-you">
+        <p>Thank you for allowing us to serve you. We appreciate your continued trust!</p>
+      </div>
+    </div>
+  </div>
+  <button id="downloadPDF">Download PDF</button>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <script>
+    const jsPDF = window.jspdf.jsPDF;
+    document.getElementById('downloadPDF').addEventListener("click", function () {
+      const invoice = document.querySelector('.invoice');
+      console.log(invoice)
+      // Set the desired font size for PDF
+      const pdfFontSize = 20; // Adjusted font size for PDF
+
+      const invoiceSection = document.querySelector('.invoice-section');
+
+      // Get computed styles to apply the font size for PDF generation
+      const computedStyles = getComputedStyle(invoiceSection);
+      const originalFontSize = computedStyles.fontSize;
+      invoiceSection.style.fontSize = pdfFontSize + 'px';
+      invoice.style.fontSize = pdfFontSize + 'px';
+
+      html2canvas(invoice, { scale: 2 })
+        .then(canvas => {
+          const imgData = canvas.toDataURL('image/png');
+          const pdf = new jsPDF();
+          const imgWidth = 210; // PDF width
+          const imgHeight = (canvas.height * imgWidth) / canvas.width; // PDF height
+          pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+          pdf.save('invoice.pdf');
+
+          // Revert back to the original font size after generating PDF
+          invoiceSection.style.fontSize = originalFontSize;
+          invoice.style.fontSize = originalFontSize;
+
+        });
+    });
+
+  </script>
+</body>
+</html>

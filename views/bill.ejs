@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Invoice Template</title>
+  <link rel="stylesheet" href="/css/bill.css">
+</head>
+
+<body>
+  <div style=" width: 100%;">
+
+    <%- include('nav'); -%>
+  </div>
+  <div class="invoice">
+    <div class="header">
+      <p class="heading1">AGNEE ENTERPRISE</p>
+      <p>Company Address : Shop no. 2, H no. 9/928/3 Common,Near zatpatiya hanuman mandir,ambaji
+        road,bhagal,surat-395003 </p>
+      <P>Phone : 9825757232</P>
+      <p> GST Number : 24AJMPG8690D1Z2</p>
+    </div>
+
+    <div class="invoice-section">
+      <div class="center">
+        <p class="bold ">(Tax Invoice)</p>
+      </div>
+      <div class="recipient-details">
+        <p class="bold">Bill To:</p>
+        <p>Name: <%= billData.recipient.name %>
+        </p>
+        <p>Contact No: <%= billData.recipient.contact_no %>
+        </p>
+        <p>Bill Number: <%= billData.billNo %>
+        </p>
+        <p> Invoice Date: <%= billData.invoiceDate%>
+        </p>
+        <p> GST No: <%= billData.recipient.gst_no%>
+        </p>
+
+        <p>
+           Place of Supply: Gujarat (24)
+
+        </p>
+      </div>
+
+      <table class="product-table">
+        <thead>
+          <tr>
+            <th>SR #</th>
+            <th>Product Name</th>
+            <th>HSN Code</th>
+            <th>Quantity</th>
+            <th>Price</th>
+            <th>Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% for (let i=0; i < billData.products.length; i++) { %>
+            <tr>
+              <td>
+                <%= i + 1 %>
+              </td>
+              <td>
+                <%= billData.products[i].name %>
+              </td>
+              <td>
+                <%=billData.HSN %>
+                
+              </td>
+              <td>
+                <%= billData.products[i].quantity %>
+              </td>
+              <td>Rs.<%= billData.products[i].price %>
+              </td>
+              <td>Rs.<%= billData.products[i].total_amount %>
+              </td>
+            </tr>
+            <% } %>
+        </tbody>
+        <tfoot>
+          <tr class="total-row">
+            <td colspan="5">Total:</td>
+            <td>Rs.<%= billData.final_amount %>
+            </td>
+          </tr>
+          <tr class="total-row">
+            <td colspan="5">SGST (9%):</td>
+            <td>Rs.<%= billData.gst.sgst %>
+            </td>
+          </tr>
+          <tr class="total-row">
+            <td colspan="5">CGST (9%):</td>
+            <td>Rs.<%= billData.gst.cgst %>
+            </td>
+          </tr>
+          <tr class="total-row">
+            <td colspan="5">Grand Total:</td>
+            <td>Rs.<%= billData.totalBillAmmount %>
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+      <div class="thank-you">
+        <p>Thank you for allowing us to serve you. We appreciate your continued trust!</p>
+      </div>
+    </div>
+  </div>
+
+  <button id="downloadPDF">Download PDF</button>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <script src="/js/bill.js"></script>
+</body>
+
+</html>

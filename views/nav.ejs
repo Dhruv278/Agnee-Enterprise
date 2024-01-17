@@ -1,0 +1,22 @@
+<!-- nav.ejs -->
+
+<nav class="navbar" >
+    <link rel="stylesheet" href="/css/nav.css">
+    <div class="container">
+      <div class="brand"><a href="/">Your Logo</a></div>
+  
+      <div class="menu-toggle">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+      </div>
+  
+      <ul class="nav-list">
+        <li><a href="/" class="<%= currentPage === 'home' ? 'active' : '' %>">Home</a></li>
+        <li><a href="/about" class="<%= currentPage === 'about' ? 'active' : '' %>">About</a></li>
+        <li><a href="/contact" class="<%= currentPage === 'contact' ? 'active' : '' %>">Contact</a></li>
+        <li><a href="/services" class="<%= currentPage === 'services' ? 'active' : '' %>">Services</a></li>
+      </ul>
+    </div>
+  </nav>
+  
