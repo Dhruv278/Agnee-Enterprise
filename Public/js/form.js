@@ -95,7 +95,7 @@
                 return response.json();
               }).then((data)=>{
                 if(data.status==="success"){
-                     window.location.href = `http://localhost:3000s/getBillData/${data.billData._id}`
+                     window.location.href = `http://localhost:3000/getBillData/${data.billData._id}`
     
                   }
               }).catch(error => {
