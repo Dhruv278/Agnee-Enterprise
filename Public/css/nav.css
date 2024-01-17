@@ -6,16 +6,23 @@ body {
   }
   
   .navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
     background-color: #333;
     color: #fff;
-   
     padding: 15px 0;
+    z-index: 1000;
   }
   
   .container {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
   }
   
   .brand a {

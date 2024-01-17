@@ -12,7 +12,7 @@ const billController=require('./Controllers/BillCOntroller');
 app.use(cookieparser())
 app.use(bodyParser.json())
 dotenv.config({path:'./config.env'});
-const db=process.env.DATABASE;
+const db=process.env.TYPE==='PRODUCTION'?process.env.DATABASE:process.env.DEVDATABASE;
 mongoose.connect(db,{ 
     useNewUrlParser: true,
     useUnifiedTopology: true
