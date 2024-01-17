@@ -76,7 +76,7 @@
               isGST:true,
               products,
             };
-            console.log(dataToSend)
+            // console.log(dataToSend)
             // Send data to the backend
            fetch('https://agnee-enterprise.onrender.com/submitInvoiceData', {
               method: 'POST',
