@@ -78,7 +78,7 @@
             };
             console.log(dataToSend)
             // Send data to the backend
-           fetch('https://agnee-enterprise.vercel.app/submitInvoiceData', {
+           fetch('http://localhost:3000/submitInvoiceData', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
@@ -95,7 +95,7 @@
                 return response.json();
               }).then((data)=>{
                 if(data.status==="success"){
-                     window.location.href = `https://agnee-enterprise.vercel.app/getBillData/${data.billData._id}`
+                     window.location.href = `http://localhost:3000s/getBillData/${data.billData._id}`
     
                   }
               }).catch(error => {
