@@ -117,6 +117,21 @@ body {
     align-items: center;
     justify-content: center;
   }
+
+  .cancel-button {
+    background-color: #ff5454; /* Red background color */
+    color: #fff; /* White text color */
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+
+  .cancel-button:hover {
+    background-color: #cc0000; /* Darker red on hover */
+  }
   @media (max-width: 768px) {
     .invoice {
       width: 90%;
