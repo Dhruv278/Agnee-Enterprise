@@ -69,9 +69,12 @@ async function  createCompanyInfo(){
 }
 
 async function getBillNo(){
-    return await Company.findById('65a6a1efa5c99e42c492b67c')
+    let id=process.env.TYPE==="PRODUCTION"?'65a8bfafdfb9d72bd46f3a6f':'65a6a1efa5c99e42c492b67c';
+    return await Company.findById(id);
 }
 
 async function IncreaseBillNumber(no){
-    await Company.findByIdAndUpdate('65a6a1efa5c99e42c492b67c',{billNo:no});
+    let id=process.env.TYPE==="PRODUCTION"?'65a8bfafdfb9d72bd46f3a6f':'65a6a1efa5c99e42c492b67c';
+   
+    await Company.findByIdAndUpdate(id,{billNo:no});
 }
