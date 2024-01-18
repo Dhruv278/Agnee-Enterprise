@@ -34,7 +34,7 @@ app.get('/',(req,res)=>{
 
 app.post('/submitInvoiceData',billController.createBill);
 app.get('/getBillData/:id',billController.getBillData);
-
+app.post('/getFilterBillData',billController.getFilterBills);
 
 
 app.use(globalerror)

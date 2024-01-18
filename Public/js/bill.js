@@ -1,5 +1,9 @@
 const jsPDF = window.jspdf.jsPDF;
-document.getElementById('downloadPDF').addEventListener("click", function () {
+
+
+function downloadInvoice(name,date){
+  // console.log(name,date);
+  console.log(``)
   const invoice = document.querySelector('.invoice');
   console.log(invoice)
   // Set the desired font size for PDF
@@ -33,9 +37,9 @@ document.getElementById('downloadPDF').addEventListener("click", function () {
       pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
 
       // Save the PDF
-      pdf.save('invoice.pdf');
+      pdf.save(`${name}_${date}_invoice.pdf`);
       invoiceSection.style.fontSize = originalFontSize;
       invoice.style.fontSize = originalFontSize;
       // Revert back to the original font size after generating PDF
     });
-});
+}

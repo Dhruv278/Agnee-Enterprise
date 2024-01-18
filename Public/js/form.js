@@ -37,11 +37,11 @@ function removeProductRow(row) {
 // Function to send data to the backend
 function sendDataToBackend() {
   const recipientName = document.getElementById('recipientName').value;
-
+  const isGST=document.getElementById('isGST').checked;
   const recipientPhone = document.getElementById('recipientPhone').value;
   const recipientGSTNo = document.getElementById('recipientGSTNo').value;
 
-
+//  console.log(xxxx);
   // Array to hold product data
   const products = [];
 
@@ -74,12 +74,12 @@ function sendDataToBackend() {
       gst_no: recipientGSTNo
     },
     invoiceDate: issueDate,
-    isGST: true,
+    isGST: isGST,
     products,
   };
   // console.log(dataToSend)
   // Send data to the backend
-  fetch('https://agnee-enterprise.onrender.com/submitInvoiceData', {
+  fetch(`${window.location.protocol}//${window.location.host}/submitInvoiceData`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -95,8 +95,8 @@ function sendDataToBackend() {
       }
       return response.json();
     }).then((data) => {
-      if (data.status === "success") {
-        window.location.href = `https://agnee-enterprise.onrender.com/getBillData/${data.billData._id}`
+      if (data.status === "success" ) {
+        window.location.href = `${window.location.protocol}//${window.location.host}/getBillData/${data.billData._id}?isGST=${isGST}`
 
       }
     }).catch(error => {
