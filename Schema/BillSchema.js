@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const moment = require('moment');
+
 
 const billSchema = mongoose.Schema({
    products:[
@@ -27,8 +29,16 @@ const billSchema = mongoose.Schema({
     final_amount:{
         type:Number,
     },
+    isPaid:{
+        type:Boolean,
+        required:true
+    },
     invoiceDate:{
-        type:String
+        type:Date,
+        set: function (value) {
+            // Parse the incoming 'dd/mm/yyyy' string and convert it to a Date object
+            return moment(value, 'DD/MM/YYYY').toDate();
+          },
     },
     gst:{
         sgst:{
@@ -46,7 +56,7 @@ const billSchema = mongoose.Schema({
         type:Number,
         
     },
-    isGst:{
+    isGST:{
         type:Boolean,
         default:true
     },
@@ -67,7 +77,6 @@ const billSchema = mongoose.Schema({
             },
         contact_no:{
             type:Number,
-            required:true
         }
     },
     createdAt:{

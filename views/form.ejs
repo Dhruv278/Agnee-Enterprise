@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,50 +8,56 @@
   <link rel="stylesheet" href="/css/form.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
+
 <body>
   <div class="invoice">
     <div class="header">
       <h1>Invoice Form</h1>
     </div>
+      <div class="invoice-section">
+        <div class="recipient-details">
+          <div class="form-group">
+            <label for="recipientName">Recipient Name:</label>
+            <input type="text" id="recipientName" name="recipientName" required>
+          </div>
 
-    <div class="invoice-section">
-      <div class="recipient-details">
-        <div class="form-group">
-          <label for="recipientName">Recipient Name:</label>
-          <input type="text" id="recipientName" name="recipientName" required>
+          <div class="form-group">
+            <label for="recipientPhone">Recipient Phone:</label>
+            <input type="tel" id="recipientPhone" name="recipientPhone" required>
+          </div>
+
+          <div class="form-group">
+            <label for="recipientGSTNo">Recipient GST Number:</label>
+            <input type="text" id="recipientGSTNo" name="recipientGSTNo">
+          </div>
+
+          <div class="form-group">
+            <label for="datepicker">Invoice date:</label>
+            <input type="date" id="datepicker" required>
+          </div>
+
+          <div class="form-group">
+            <label for="isGST"> GST:</label>
+            <input type="checkbox" id="isGST" required>
+          </div>
         </div>
 
-        <div class="form-group">
-          <label for="recipientPhone">Recipient Phone:</label>
-          <input type="tel" id="recipientPhone" name="recipientPhone" required>
-        </div>
+        <div class="product-data">
+          <h3>Product Data</h3>
+          <div class="product-row">
+            <input type="text" placeholder="Product" class="product" />
+            <input type="number" placeholder="Quantity" class="quantity" />
+            <input type="text" placeholder="Price" class="price" />
+            <button class="remove-product-btn" onclick="removeProductRow(this)"><i class="fa fa-close"></i></button>
+          </div>
+          <div class="actions" id="actions">
 
-        <div class="form-group">
-          <label for="recipientGSTNo">Recipient GST Number:</label>
-          <input type="text" id="recipientGSTNo" name="recipientGSTNo" >
-        </div>
-
-        <div class="form-group">
-          <label for="datepicker">Invoice date:</label>
-          <input type="date" id="datepicker" required>
+            <button class="btn" id="addProductBtn">Add Product</button>
+            <button class="btn" id="downloadPDF">Generate Bill</button>
+          </div>
         </div>
       </div>
-
-      <div class="product-data">
-        <h3>Product Data</h3>
-        <div class="product-row">
-          <input type="text" placeholder="Product" class="product" />
-          <input type="number" placeholder="Quantity" class="quantity" />
-          <input type="text" placeholder="Price" class="price" />
-          <button class="remove-product-btn"  onclick="removeProductRow(this)"><i class="fa fa-close"></i></button>
-        </div>
-        <div class="actions" id="actions">
-
-          <button class="btn" id="addProductBtn">Add Product</button>
-          <button class="btn" id="downloadPDF">Generate Bill</button>
-        </div>
-      </div>
-    </div>
+    
 
     <div class="thank-you">
       <p>Thank you for using our invoice form!</p>
@@ -59,4 +66,5 @@
 
   <script src="/js/form.js"></script>
 </body>
+
 </html>

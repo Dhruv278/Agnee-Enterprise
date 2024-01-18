@@ -26,14 +26,20 @@
         <p class="bold">Bill To:</p>
         <p>Name: <%= billData.recipient.name %>
         </p>
-        <p>Contact No: <%= billData.recipient.contact_no %>
-        </p>
+        <% if(billData.recipient.gst_no){ %>
+          <p> GST No: <%= billData.recipient.contact_no%>
+          </p>
+          <% } %>
+        <% if(billData.isGST){ %>
         <p>Bill Number: <%= billData.billNo %>
         </p>
-        <p> Invoice Date: <%= billData.invoiceDate%>
+        <% }%>
+        <p> Invoice Date: <%=billData.invoiceDate.toLocaleDateString('en-GB') %>
         </p>
+        <% if(billData.recipient.gst_no){ %>
         <p> GST No: <%= billData.recipient.gst_no%>
         </p>
+        <% } %>
 
         <p>
            Place of Supply: Gujarat (24)
@@ -81,6 +87,7 @@
             <td>Rs.<%= billData.final_amount %>
             </td>
           </tr>
+          <% if(billData.isGST){ %>
           <tr class="total-row">
             <td colspan="5">SGST (9%):</td>
             <td>Rs.<%= billData.gst.sgst %>
@@ -91,8 +98,9 @@
             <td>Rs.<%= billData.gst.cgst %>
             </td>
           </tr>
+          <% } %>
           <tr class="total-row">
-            <td colspan="5">Grand Total:</td>
+            <td colspan="5">Grand Total(Round off):</td>
             <td>Rs.<%= billData.totalBillAmmount %>
             </td>
           </tr>
@@ -104,7 +112,7 @@
     </div>
   </div>
 
-  <button id="downloadPDF">Download PDF</button>
+  <button id="downloadPDF" onclick="downloadInvoice('<%=billData.recipient.name%>','<%= billData.invoiceDate.toLocaleDateString(`en-GB`)%>')">Download PDF</button>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>

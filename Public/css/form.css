@@ -85,6 +85,8 @@ body {
     border-radius: 3px;
     padding: 8px 15px;
     cursor: pointer;
+    position: relative;
+    top: -6px;
   }
 
   .remove-product-btn:hover {
