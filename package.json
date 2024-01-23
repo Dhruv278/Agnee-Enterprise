@@ -5,7 +5,7 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "build:prod":"cd frontend && npm install  && npm run build"
+    "build:prod":"cd frontend && npm install --force  && npm run build"
   },
   "author": "",
   "license": "ISC",
