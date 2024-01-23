@@ -14,7 +14,7 @@ export const createBill=(billData)=>async(dispatch)=>{
             }
         }
 
-        const { data }=await axios.post(`http://localhost:4000/submitInvoiceData`,billData,config);
+        const { data }=await axios.post(`/api/v1/submitInvoiceData`,billData,config);
         console.log(data);
         dispatch({
             type:CREATE_BILL_SUCCESS,
@@ -40,7 +40,7 @@ export const getBillData=(id)=>async(dispatch)=>{
         })
       
 
-        const { data }=await axios.get(`http://localhost:4000/getBillData/${id}`);
+        const { data }=await axios.get(`/api/v1/getBillData/${id}`);
         console.log(data);
         dispatch({
             type:GET_BILL_DATA_SUCCESS,

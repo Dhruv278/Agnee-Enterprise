@@ -44,7 +44,7 @@ const BillDetails = () => {
             const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
             pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-            pdf.save(`invoice.pdf`);
+            pdf.save(`${billDetails.recipient.recipientName}_${new Date(billDetails.invoiceDate).toLocaleDateString('en-GB')}_invoice.pdf`);
 
             if (invoiceSectionElement) {
                 invoiceSectionElement.style.fontSize = ''; // Revert back to the original font size
@@ -130,10 +130,12 @@ const BillDetails = () => {
                         </div>
                     </div>
                 </div>
+            <div className={styles.center} >
 
                 <button id="downloadPDF" className={styles.downloadPDF} onClick={downloadInvoice}>
                     Download PDF
                 </button>
+            </div>
             </Fragment>
         )
     );

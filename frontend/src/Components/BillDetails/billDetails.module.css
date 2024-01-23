@@ -100,7 +100,7 @@
   color: #555;
 }
 
-button#downloadPDF {
+.downloadPDF {
   padding: 15px 20px;
   background: linear-gradient(to right, #007bff, #0056b3);
   color: #fff;
@@ -111,7 +111,7 @@ button#downloadPDF {
   transition: background 0.3s ease;
 }
 
-button#downloadPDF:hover {
+.downloadPDF:hover {
   background: linear-gradient(to right, #0056b3, #003366);
 }
 
