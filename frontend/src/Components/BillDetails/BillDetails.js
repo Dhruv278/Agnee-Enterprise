@@ -32,7 +32,9 @@ const BillDetails = () => {
         const invoiceSectionElement = invoiceSection 
 
         if(window.innerWidth < 700){
+            document.title = `${billDetails.recipient.recipientName}_${new Date(billDetails.invoiceDate).toLocaleDateString('en-GB')}_invoice`;
             window.print();
+            document.title="Agnee Enterprise"
         }else{
 
             html2canvas(invoice, { scale: 2 }).then(canvas => {
