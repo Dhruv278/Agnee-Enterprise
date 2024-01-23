@@ -1,5 +1,5 @@
 /* BillDetails.module.css */
-.body {
+body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background: linear-gradient(to right, #e9f0ec, #e9e9e9);
   margin: 0;
@@ -10,6 +10,8 @@
   justify-content: center;
   min-height: 100vh;
 }
+
+
 
 .invoice {
   width: 80%;
@@ -30,11 +32,12 @@
   border-top-right-radius: 15px;
 }
 
-.heading1{
+.heading1 {
   margin: 0;
   font-size: 28px;
 }
-.header p{
+
+.header p {
   font-size: 19px;
 }
 
@@ -121,11 +124,12 @@
   align-items: center;
 }
 
-
 @media print {
   body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #fff; /* Set background color for print */
+    background: none;
+    display: block;
+    margin: 0;
+    padding: 0;
   }
 
   .invoice {
@@ -136,66 +140,80 @@
   }
 
   .header {
-    background: #fff;
-    color: #333;
-    text-shadow: none;
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
+    /* Preserve the background color for the header in print mode */
+  
+    box-shadow: inset 0 0 0 1000px  #0099ff;
+    color: #fff;
+    text-shadow: 2px 2px 5px black;
+    padding: 20px;
+    text-align: center;
+    border-radius: 2%;
+  }
+
+  .heading1 {
+    font-size: 24px;
+  }
+
+
+  .downloadPDF {
+    display: none;
+  }
+
+}
+@media print and (-webkit-min-device-pixel-ratio:0) {
+  .header {
+    color: #fff;
+    -webkit-print-color-adjust: exact;
+  }
+}
+
+
+
+
+
+
+@media only screen and (max-width: 700px) {
+  .invoice {
+    width: 100%;
+  }
+
+  .header {
+    padding: 15px;
+    /* Adjust padding for smaller screens */
+  }
+
+  .heading1 {
+    font-size: 40px;
+    /* Adjust font size for the main heading */
   }
 
   .invoice_section {
     padding: 10px;
+    /* Adjust overall padding for the invoice section */
     font-size: 14px;
-    color: #333;
+    /* Adjust font size for the content within the invoice section */
   }
 
   .recipient_details {
-    margin-bottom: 10px;
-    border-bottom: 1px solid #ccc;
-    padding-bottom: 5px;
-  }
-
-  .recipient_details h2 {
-    margin-bottom: 3px;
-    font-size: 16px;
-    color: #333;
-  }
-
-  .recipient_details p {
-    margin: 0;
-    color: #666;
+    grid-template-columns: 1fr;
+    /* Stack columns on smaller screens */
   }
 
   .product_table th,
   .product_table td {
     padding: 8px;
+    /* Adjust padding for table cells on smaller screens */
   }
 
-  .product_table th {
-    background-color: #f5f5f5;
-  }
-
-  .total_row td {
-    text-align: right;
-    font-weight: bold;
-  }
-
-  .total_row {
-    border-top: 1px solid #ddd;
-  }
-
-  .bold {
-    font-weight: bold;
+  .downloadPDF {
+    padding: 12px 16px;
+    /* Adjust button padding for smaller screens */
+    font-size: 16px;
+    /* Adjust button font size for smaller screens */
   }
 
   .thank_you {
-    margin-top: 10px;
-    text-align: center;
-    font-style: italic;
-    color: #555;
-  }
-
-  #downloadPDF {
-    display: none; /* Hide the download button on print */
+    font-size: 12px;
+    /* Adjust font size for the thank you message on smaller screens */
   }
 }

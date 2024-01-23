@@ -1,6 +1,6 @@
 // BillDetails.js
 import React, { useEffect, useRef, Fragment } from 'react';
-import styles from './billDetails.module.css'; // Import the corresponding CSS module
+import   './billDetails.css'; // Import the corresponding CSS module
 import { useDispatch, useSelector } from 'react-redux';
 import { clearErrors, getBillData } from '../../Actions/billActions';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -17,6 +17,7 @@ const BillDetails = () => {
     useEffect(() => {
         if (isError) alert(error);
         else {
+            // console.log(process.env.TYPE)
             dispatch(getBillData(id));
         }
     }, [dispatch, id, isError]);
@@ -30,26 +31,26 @@ const BillDetails = () => {
         // Convert invoiceSection to HTMLElement
         const invoiceSectionElement = invoiceSection 
 
-            console.log(invoice)
-        if (window.innerWidth > 700 && invoiceSectionElement) {
-            invoiceSectionElement.style.fontSize = pdfFontSize + 'px';
+        if(window.innerWidth < 700){
+            window.print();
+        }else{
+
+            html2canvas(invoice, { scale: 2 }).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const pdf = new jsPDF();
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = pdf.internal.pageSize.getHeight();
+                const imgWidth = pdfWidth;
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    
+                pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+                pdf.save(`${billDetails.recipient.recipientName}_${new Date(billDetails.invoiceDate).toLocaleDateString('en-GB')}_invoice.pdf`);
+    
+                if (invoiceSectionElement) {
+                    invoiceSectionElement.style.fontSize = ''; // Revert back to the original font size
+                }
+            });
         }
-
-        html2canvas(invoice, { scale: 2 }).then(canvas => {
-            const imgData = canvas.toDataURL('image/png');
-            const pdf = new jsPDF();
-            const pdfWidth = pdf.internal.pageSize.getWidth();
-            const pdfHeight = pdf.internal.pageSize.getHeight();
-            const imgWidth = pdfWidth;
-            const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-            pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-            pdf.save(`${billDetails.recipient.recipientName}_${new Date(billDetails.invoiceDate).toLocaleDateString('en-GB')}_invoice.pdf`);
-
-            if (invoiceSectionElement) {
-                invoiceSectionElement.style.fontSize = ''; // Revert back to the original font size
-            }
-        });
     };
 
     return (
@@ -57,20 +58,20 @@ const BillDetails = () => {
             <p>Loading</p>
         ) : (
             <Fragment>
-                <div className={styles.invoice} ref={invoiceRef}>
-                    <div className={styles.header}>
-                        <h1 className={styles.heading1}>AGNEE ENTERPRISE</h1>
+                <div className="invoice" ref={invoiceRef}>
+                    <div className="header">
+                        <h1 className="heading1">AGNEE ENTERPRISE</h1>
                         <p>Company Address: Shop no. 2, H no. 9/928/3 Common, Near zatpatiya hanuman mandir, ambaji road, bhagal, surat-395003 </p>
                         <p>Phone: 9825757232</p>
                         <p> GST Number: 24AJMPG8690D1Z2</p>
                     </div>
 
-                    <div className={styles.invoice_section} id="invoice_section">
-                        <div className={styles.center}>
-                            <p className={styles.bold}>(Tax Invoice)</p>
+                    <div className="invoice_section" id="invoice_section">
+                        <div className="center">
+                            <p className="bold">(Tax Invoice)</p>
                         </div>
-                        <p className={styles.bold}>Bill To:</p>
-                        <div className={styles.recipient_details}>
+                        <p className="bold">Bill To:</p>
+                        <div className="recipient_details">
                             <p>Name: {billDetails.recipient.recipientName}</p>
                             {billDetails.recipient.recipientPhone && <p> Contact No: {billDetails.recipient.recipientPhone}</p>}
                             {billDetails.isGST && <p>Bill Number: {billDetails.billNo}</p>}
@@ -79,7 +80,7 @@ const BillDetails = () => {
                             <p>Place of Supply: Gujarat (24)</p>
                         </div>
 
-                        <table className={styles.product_table}>
+                        <table className="product_table">
                             <thead>
                                 <tr>
                                     <th>SR #</th>
@@ -103,36 +104,36 @@ const BillDetails = () => {
                                 ))}
                             </tbody>
                             <tfoot>
-                                <tr className={styles.total_row}>
+                                <tr className="total_row">
                                     <td colSpan="5">Total:</td>
                                     <td>Rs.{billDetails.final_amount}</td>
                                 </tr>
                                 {billDetails.isGST && (
                                     <>
-                                        <tr className={styles.total_row}>
+                                        <tr className="total_row">
                                             <td colSpan="5">SGST (9%):</td>
                                             <td>Rs.{billDetails.gst.sgst}</td>
                                         </tr>
-                                        <tr className={styles.total_row}>
+                                        <tr className="total_row">
                                             <td colSpan="5">CGST (9%):</td>
                                             <td>Rs.{billDetails.gst.cgst}</td>
                                         </tr>
                                     </>
                                 )}
-                                <tr className={styles.total_row}>
+                                <tr className="total_row">
                                     <td colSpan="5">Grand Total(Round off):</td>
                                     <td>Rs.{billDetails.totalBillAmmount}</td>
                                 </tr>
                             </tfoot>
                         </table>
-                        <div className={styles.thank_you}>
+                        <div className="thank_you">
                             <p>Thank you for allowing us to serve you. We appreciate your continued trust!</p>
                         </div>
                     </div>
                 </div>
-            <div className={styles.center} >
+            <div className="center" >
 
-                <button id="downloadPDF" className={styles.downloadPDF} onClick={downloadInvoice}>
+                <button id="downloadPDF" className="downloadPDF" onClick={downloadInvoice}>
                     Download PDF
                 </button>
             </div>
