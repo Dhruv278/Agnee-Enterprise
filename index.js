@@ -32,7 +32,7 @@ app.post('/api/v1/submitInvoiceData', billController.createBill);
 app.get('/api/v1/getBillData/:id', billController.getBillData);
 app.post('/api/v1/getFilterBillData', billController.getFilterBills);
 
-if(process.env.TYPE="DEVELEOPMENT"){
+if(process.env.TYPE="DEVELOPMENT"){
 
     app.use(express.static(path.join(__dirname, '/frontend/build')));
     app.get('*', (req, res) => {
