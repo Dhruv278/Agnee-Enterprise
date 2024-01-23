@@ -15,6 +15,7 @@ const BillDetails = () => {
     const { loading, error, isError, billDetails } = useSelector(state => state.billDetails);
 
     useEffect(() => {
+        document.title="Agnee Enterprise"
         if (isError) alert(error);
         else {
             // console.log(process.env.TYPE)
@@ -34,7 +35,9 @@ const BillDetails = () => {
         if(window.innerWidth < 700){
             document.title = `${billDetails.recipient.recipientName}_${new Date(billDetails.invoiceDate).toLocaleDateString('en-GB')}_invoice`;
             window.print();
-            document.title="Agnee Enterprise"
+            console.log(document.title)
+            console.log(document)
+           
         }else{
 
             html2canvas(invoice, { scale: 2 }).then(canvas => {
