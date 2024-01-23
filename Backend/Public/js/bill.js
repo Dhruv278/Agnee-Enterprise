@@ -2,6 +2,7 @@ const jsPDF = window.jspdf.jsPDF;
 
 
 function downloadInvoice(name,date){
+  window.print();
   // console.log(name,date);
   console.log(``)
   const invoice = document.querySelector('.invoice');
@@ -34,7 +35,7 @@ function downloadInvoice(name,date){
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
       // Add the image to the PDF
-      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, pdfHeight);
 
       // Save the PDF
       pdf.save(`${name}_${date}_invoice.pdf`);

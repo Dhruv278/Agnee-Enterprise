@@ -37,7 +37,7 @@ const billSchema = mongoose.Schema({
         type:Date,
         set: function (value) {
             // Parse the incoming 'dd/mm/yyyy' string and convert it to a Date object
-            return moment(value, 'DD/MM/YYYY').toDate();
+            return moment(value, 'YYYY/MM/DD').toDate();
           },
     },
     gst:{
@@ -65,17 +65,21 @@ const billSchema = mongoose.Schema({
         required:true
     },
     recipient:{
-        name:{
+        recipientName:{
             type:String,
             required:true
         },
-        gst_no:{
+        slug:{
+            type:String,
+            required:true
+        },
+        recipientGSTNo:{
             type:String
         },
-        email: {
+        recipientEmail: {
             type: String,
             },
-        contact_no:{
+            recipientPhone:{
             type:Number,
         }
     },
