@@ -2,10 +2,14 @@ const catchAsync=require('./../errorHandling/cathError');
 const ErrorFormate=require('./../errorHandling/ErrorFormate');
 const Bill=require('./../Schema/BillSchema');
 const Company=require('./../Schema/companySchema');
+const moment = require('moment');
+
 
 exports.createBill=catchAsync(async(req,res,next)=>{
     const billData=req.body;
     var final_amount=0;
+    console.log(req.body)
+    billData.recipient.slug=createSlug(billData.recipient.recipientName);
     billData.products.forEach((product)=>{
         final_amount=final_amount+parseFloat(product.total_amount);
     })
@@ -42,23 +46,50 @@ exports.getBillData=catchAsync(async(req,res,next)=>{
     const billData=await Bill.findById(billId);
     console.log(req.query);
     if(!billData)return next(new ErrorFormate('Invalid bill id',500));
-    if(req.query.isGST==='false'){
+    if(!billData.isGST){
         console.log(billData)
         const deletData=await Bill.findByIdAndDelete(billData._id);
     }
     console.log(billData)
-    res.render('bill',{
+    res.status(200).json({
         billData,
-        currentPage:'Home'
+        status:'success',
     });
 })
 
 
 
 exports.getFilterBills=catchAsync(async(req,res,next)=>{
-        const BillData=await Bill.find(req.body.query);
+     let query={};
+     let options=req.body;
+    // Filter by recipient name
+    if (options.recipientName) {
+        query['recipient.slug'] = {
+          $regex: new RegExp(createSlug(options.recipientName), 'i'),
+        };
+      }
+  
+      // Filter by date range
+      if (options.startDate && options.endDate) {
+        query.invoiceDate = { $gte:moment(options.startDate, 'DD/MM/YYYY').toDate(), $lte:  moment(options.endDate, 'DD/MM/YYYY').toDate() };
+      }
+  
+      // Filter by bill number
+      
+      // Filter by isPaid status
+      if (options.isPaid !== undefined) {
+          query.isPaid = options.isPaid;
+        }
+        if (options.billNo) {
+          query={};
+          query.billNo = options.billNo;
+        }
+  
+      const bills = await Bill.find(query).sort({ isPaid: 1 });
+  
         res.status(200).json({
-            BillData
+            totalBills:bills.length,
+            bills
         }) 
 })
 
@@ -78,3 +109,18 @@ async function IncreaseBillNumber(no){
    
     await Company.findByIdAndUpdate(id,{billNo:no});
 }
+
+function createSlug(personName) {
+    // Convert to lowercase
+    let slug = personName.toLowerCase();
+    
+    // Replace spaces with hyphens
+    slug = slug.replace(/\s/g, '-');
+    
+    // Remove non-alphanumeric characters except hyphens
+    slug = slug.replace(/[^a-z0-9-]/g, '');
+    
+    return slug;
+  }
+  
+  

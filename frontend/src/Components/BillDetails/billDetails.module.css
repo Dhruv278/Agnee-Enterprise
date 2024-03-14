@@ -1,0 +1,201 @@
+/* BillDetails.module.css */
+.body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(to right, #e9f0ec, #e9e9e9);
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.invoice {
+  width: 80%;
+  margin: 20px auto;
+  background: linear-gradient(to bottom, #fff, #f0f0f0);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  border-radius: 15px;
+  overflow: hidden;
+}
+
+.header {
+  background: linear-gradient(to right, #0099ff, #0066cc);
+  color: #fff;
+  text-shadow: 2px 2px 5px black;
+  padding: 20px;
+  text-align: center;
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+}
+
+.heading1{
+  margin: 0;
+  font-size: 28px;
+}
+.header p{
+  font-size: 19px;
+}
+
+.invoice_section {
+  padding: 20px;
+  font-size: 16px;
+  color: #333;
+}
+
+.recipient_details {
+  margin-bottom: 10px;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 5px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.recipient_details p {
+  margin: 0;
+  color: #666;
+  white-space: nowrap;
+}
+
+.product_table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.product_table th,
+.product_table td {
+  border: 1px solid #ddd;
+  padding: 12px;
+  text-align: left;
+}
+
+.product_table th {
+  background-color: #f5f5f5;
+}
+
+.total_row td {
+  text-align: right;
+  font-weight: bold;
+}
+
+.total_row {
+  border-top: 2px solid #ddd;
+}
+
+.bold {
+  font-weight: bold;
+}
+
+.heading1 {
+  font-size: 50px;
+}
+
+.thank_you {
+  margin-top: 20px;
+  text-align: center;
+  font-style: italic;
+  color: #555;
+}
+
+.downloadPDF {
+  padding: 15px 20px;
+  background: linear-gradient(to right, #007bff, #0056b3);
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 18px;
+  transition: background 0.3s ease;
+}
+
+.downloadPDF:hover {
+  background: linear-gradient(to right, #0056b3, #003366);
+}
+
+.center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+@media print {
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #fff; /* Set background color for print */
+  }
+
+  .invoice {
+    width: 100%;
+    margin: 0;
+    box-shadow: none;
+    border-radius: 0;
+  }
+
+  .header {
+    background: #fff;
+    color: #333;
+    text-shadow: none;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+  }
+
+  .invoice_section {
+    padding: 10px;
+    font-size: 14px;
+    color: #333;
+  }
+
+  .recipient_details {
+    margin-bottom: 10px;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 5px;
+  }
+
+  .recipient_details h2 {
+    margin-bottom: 3px;
+    font-size: 16px;
+    color: #333;
+  }
+
+  .recipient_details p {
+    margin: 0;
+    color: #666;
+  }
+
+  .product_table th,
+  .product_table td {
+    padding: 8px;
+  }
+
+  .product_table th {
+    background-color: #f5f5f5;
+  }
+
+  .total_row td {
+    text-align: right;
+    font-weight: bold;
+  }
+
+  .total_row {
+    border-top: 1px solid #ddd;
+  }
+
+  .bold {
+    font-weight: bold;
+  }
+
+  .thank_you {
+    margin-top: 10px;
+    text-align: center;
+    font-style: italic;
+    color: #555;
+  }
+
+  #downloadPDF {
+    display: none; /* Hide the download button on print */
+  }
+}
