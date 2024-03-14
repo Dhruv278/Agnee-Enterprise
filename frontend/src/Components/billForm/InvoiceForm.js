@@ -194,7 +194,7 @@ const InvoiceForm = () => {
                   onChange={(e) => handleProductChange(index, 'price', e.target.value)}
                 />
                 <button className={styles.remove_product_btn} onClick={() => removeProduct(index)}>
-                <i class="fa fa-close"></i>
+                <i className="fa fa-close"></i>
                 </button>
               </div>
             ))}

@@ -14,7 +14,7 @@ let initialState={}
 
 const middleware=[thunk];
 // Use composeWithDevTools only in development
-const composeEnhancers = process.env.TYPE === 'DEVELOPMENT' ? composeWithDevTools : compose;
+const composeEnhancers = process.env.TYPE === 'DEVELOPMENT' ? composeWithDevTools : composeWithDevTools;
 
 const store = createStore(reducer, initialState, composeEnhancers(applyMiddleware(...middleware)));
 
