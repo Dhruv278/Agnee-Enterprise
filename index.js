@@ -41,8 +41,8 @@ if(process.env.TYPE="PRODUCTION"){
         console.log(path.join(__dirname, './frontend/build/index.html'))
         res.sendFile(path.resolve(__dirname, './frontend/build/index.html'))
     })
-}
 
+}
 app.use(globalerror)
 
 const port = process.env.PORT || 4000;
