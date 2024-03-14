@@ -31,6 +31,11 @@ app.set('views', path.join(__dirname, 'Backend/views/'));
 app.post('/api/v1/submitInvoiceData', billController.createBill);
 app.get('/api/v1/getBillData/:id', billController.getBillData);
 app.post('/api/v1/getFilterBillData', billController.getFilterBills);
+app.get("/api/test",(req,res)=>{
+    res.status(200).json({
+        message:"done"
+    })
+})
 
 if(process.env.TYPE="DEVELOPMENT"){
 
