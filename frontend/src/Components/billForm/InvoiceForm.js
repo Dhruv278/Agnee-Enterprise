@@ -147,6 +147,7 @@ const InvoiceForm = () => {
                 onChange={handleDateChange}
                 required
                 className={styles.form_group_input_text}
+                style={{"width":"30%"}}
               />
             </div>
 
