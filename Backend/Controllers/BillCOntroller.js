@@ -3,7 +3,8 @@ const ErrorFormate=require('./../errorHandling/ErrorFormate');
 const Bill=require('./../Schema/BillSchema');
 const Company=require('./../Schema/companySchema');
 const moment = require('moment');
-
+const XLSX = require('xlsx');
+const fs = require('fs');
 
 exports.createBill=catchAsync(async(req,res,next)=>{
     const billData=req.body;
@@ -93,6 +94,144 @@ exports.getFilterBills=catchAsync(async(req,res,next)=>{
         }) 
 })
 
+exports.getDataByMonths=catchAsync( async (req, res) => {
+    const { startDate, endDate } = req.query;
+
+    try {
+        // Aggregate the data grouped by both month and year
+        const salesData = await Bill.aggregate([
+            {
+                $match: {
+                    invoiceDate: {
+                        $gte: new Date(startDate),
+                        $lte: new Date(endDate)
+                    }
+                }
+            },
+            {
+                $group: {
+                    _id: {
+                        month: { $month: "$invoiceDate" },
+                        year: { $year: "$invoiceDate" }
+                    },
+                    totalSales: { $sum: "$totalBillAmmount" }
+                }
+            },
+            {
+                $sort: { "_id.year": 1, "_id.month": 1 }
+            }
+        ]);
+
+        // Map month numbers to month names
+        const monthNames = [
+            "January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
+        ];
+
+        const formattedData = salesData.map(item => ({
+            Month: `${monthNames[item._id.month - 1]}/${item._id.year}`,
+            TotalSales: item.totalSales
+        }));
+        console.log(formattedData)
+        // Create a new workbook and worksheet
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.json_to_sheet(formattedData);
+
+        // Append the worksheet to the workbook
+        XLSX.utils.book_append_sheet(wb, ws, "Sales Data");
+
+        // Define the file path
+        const filePath = `./sales_per_month_${Date.now()}.xlsx`;
+
+        // Write the workbook to a file
+        XLSX.writeFile(wb, filePath);
+
+        // Send the file as a response
+        res.download(filePath, (err) => {
+            if (err) {
+                res.status(500).json({ error: err.message });
+            }
+
+            // Delete the file after sending it
+            fs.unlinkSync(filePath);
+        });
+
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+exports.getBillByMonth=catchAsync(async (req, res) => {
+    const { month, year } = req.query;
+
+    try {
+        // Define the start and end dates for the given month and year
+        const startDate = new Date(year, month - 1, 1);
+        const endDate = new Date(year, month, 0, 23, 59, 59, 999);
+
+        // Query to find all invoices within the specified month
+        const bills = await Bill.find({
+            invoiceDate: {
+                $gte: startDate,
+                $lte: endDate
+            }
+        }).select('invoiceDate billNo recipient recipient final_amount gst.sgst gst.cgst totalBillAmmount');
+        console.log(bills)
+        // Calculate the totals
+        const totalAmount = bills.reduce((sum, bill) => sum + bill.final_amount, 0);
+        const totalBillAmount = bills.reduce((sum, bill) => sum + bill.totalBillAmmount, 0);
+
+        // Format the data for Excel
+        const formattedBills = bills.map(bill => ({
+            "Bill Date": bill.invoiceDate.toISOString().split('T')[0], // Convert to 'YYYY-MM-DD' format
+            "Bill Number": bill.billNo,
+            "Recipient Name": bill.recipient.recipientName,
+            "GST Number": bill.recipient.recipientGSTNo,
+            "Total Amount": bill.final_amount,
+            "SGST Paid": bill.gst.sgst,
+            "CGST Paid": bill.gst.cgst,
+            "Total Bill Amount": bill.totalBillAmmount
+        }));
+
+        // Add the summary row at the end
+        formattedBills.push({
+            "Bill Date": "TOTAL",
+            "Bill Number": "",
+            "Recipient Name": "",
+            "GST Number":"",
+            "Total Amount": totalAmount,
+            "SGST Paid": "",
+            "CGST Paid": "",
+            "Total Bill Amount": totalBillAmount
+        });
+
+        // Create a new workbook and worksheet
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.json_to_sheet(formattedBills);
+
+        // Append the worksheet to the workbook
+        XLSX.utils.book_append_sheet(wb, ws, "Bills");
+
+        // Define the file path
+        const filePath = `./bills_${month}_${year}_${Date.now()}.xlsx`;
+
+        // Write the workbook to a file
+        XLSX.writeFile(wb, filePath);
+
+        // Send the file as a response
+        res.download(filePath, (err) => {
+            if (err) {
+                res.status(500).json({ error: err.message });
+            }
+
+            // Delete the file after sending it
+            fs.unlinkSync(filePath);
+        });
+
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
 
 
 async function  createCompanyInfo(){
