@@ -36,6 +36,15 @@ const BillSummary: React.FC = () => {
     dispatch(setCurrentInvoice(invoice));
     navigate(`/invoice/${invoice._id}`)
   }
+  function convertToDDMMYYYY(dateString: string): string {
+    const date = new Date(dateString);
+    const day = String(date.getUTCDate()).padStart(2, '0');
+    const month = String(date.getUTCMonth() + 1).padStart(2, '0'); // Months are zero-indexed
+    const year = date.getUTCFullYear();
+    console.log(`${day}/${month}/${year}`)
+  
+    return `${day}/${month}/${year}`;
+  }
   return (
     <Container>
       <FilterSection>
@@ -74,7 +83,7 @@ const BillSummary: React.FC = () => {
             {filteredBills.map((bill) => (
               <tr key={bill.billNo}>
                 <td>{bill.billNo}</td>
-                <td>{new Date(bill.invoiceDate).getDay()}/{new Date(bill.invoiceDate).getMonth()+1}/{new Date(bill.invoiceDate).getFullYear()}</td>
+                <td>{convertToDDMMYYYY(bill.invoiceDate)}</td>
                 <td>{bill.recipient.recipientName}</td>
                 <td>{bill.totalBillAmmount.toFixed(2)}</td>
                 <td>

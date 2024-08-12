@@ -89,7 +89,7 @@ exports.getFilterBills=catchAsync(async(req,res,next)=>{
         }
   
       const bills = await Bill.find(query).sort({ isPaid: 1 });
-  
+        console.log(bills)
         res.status(200).json({
             totalBills:bills.length,
             data:bills
