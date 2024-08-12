@@ -1,8 +1,9 @@
 import { configureStore } from '@reduxjs/toolkit';
 
+import InvoiceSlice from './Slices/InvoiceSlice';
 const store = configureStore({
     reducer: {
-    
+    invoice:InvoiceSlice
     },
 });
 
