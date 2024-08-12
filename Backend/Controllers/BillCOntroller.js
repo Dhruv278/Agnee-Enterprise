@@ -31,9 +31,12 @@ exports.createBill=catchAsync(async(req,res,next)=>{
     }
     billData.totalBillAmmount=Math.round(billData.final_amount+totalGst);
 
-    let newBillData;
-
+    let newBillData=billData;
+        if(billData.isGST)
          newBillData=await Bill.create(billData);
+        else{
+            billData._id='temp_id'
+        }
     // console.log(newBillData)
     res.status(200).json({
         status:"success",
