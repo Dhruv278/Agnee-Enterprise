@@ -175,7 +175,7 @@ const InvoiceForm: React.FC = () => {
     return () => {
       // dispatch(clearErrors());
     };
-  }, [dispatch, isError, navigate, loading]);
+  }, [dispatch, isError, navigate, loading,isInvoiceCreated]);
 
   const addProduct = () => {
     setProducts([...products, { name: '', quantity: '', price: '' }]);
