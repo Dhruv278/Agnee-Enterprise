@@ -253,6 +253,60 @@ exports.getBillByMonth=catchAsync(async (req, res) => {
     }
 });
 
+exports.getBillByMonthJson=catchAsync(async (req, res) => {
+    const { startBodyDate, endBodyDate } = req.body;
+
+    try {
+        // Define the start and end dates for the given month and year
+        const startDate = new Date(startBodyDate);
+        const endDate = new Date(endBodyDate);
+
+        // Query to find all invoices within the specified month
+        const bills = await Bill.find({
+            invoiceDate: {
+                $gte: startDate,
+                $lte: endDate
+            }
+        }).select('invoiceDate billNo recipient recipient final_amount gst.sgst gst.cgst totalBillAmmount');
+        // console.log(bills)
+        // Calculate the totals
+        // const totalAmount = bills.reduce((sum, bill) => sum + bill.final_amount, 0);
+        // const totalBillAmount = bills.reduce((sum, bill) => sum + bill.totalBillAmmount, 0);
+
+        // // Format the data for Excel
+        // const formattedBills = bills.map(bill => ({
+        //     "Bill Date": bill.invoiceDate.toISOString().split('T')[0], // Convert to 'YYYY-MM-DD' format
+        //     "Bill Number": bill.billNo,
+        //     "Recipient Name": bill.recipient.recipientName,
+        //     "GST Number": bill.recipient.recipientGSTNo,
+        //     "Total Amount": bill.final_amount,
+        //     "SGST Paid": bill.gst.sgst,
+        //     "CGST Paid": bill.gst.cgst,
+        //     "Total Bill Amount": bill.totalBillAmmount
+        // }));
+
+        // // Add the summary row at the end
+        // formattedBills.push({
+        //     "Bill Date": "TOTAL",
+        //     "Bill Number": "",
+        //     "Recipient Name": "",
+        //     "GST Number":"",
+        //     "Total Amount": totalAmount,
+        //     "SGST Paid": "",
+        //     "CGST Paid": "",
+        //     "Total Bill Amount": totalBillAmount
+        // });
+        res.status(200).json({
+            data:{
+                formattedBills:bills
+            }
+        })
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+
 
 async function  createCompanyInfo(){
    await Company.create({billNo:1,HSN:9602});

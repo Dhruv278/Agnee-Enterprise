@@ -9,11 +9,13 @@ import MainPage from './Components/Pages/MainPage';
 import InvoiceForm from './Components/Pages/InvoiceForm';
 import InvoicePage from './Components/Pages/InvoicePage';
 import BillSummary from './Components/Pages/AllBills';
+import { ToastContainer } from 'react-toastify';
 
 function App() {
   return (
     <Provider store={store}>
       <div className="App">
+        <ToastContainer />
         <Routes>
           <Route path="/" element={<MainPage />} >
             <Route path='/' element={<InvoiceForm />} />
