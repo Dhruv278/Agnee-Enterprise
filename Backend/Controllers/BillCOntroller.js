@@ -16,6 +16,7 @@ exports.createBill=catchAsync(async(req,res,next)=>{
     })
     billData.final_amount=parseFloat(final_amount.toFixed(2));
     let companyData=await getBillNo();
+    console.log(companyData)
     billData.HSN=companyData.HSN
     billData.isPaid=billData.isPaid ? billData.isPaid : true;
     let totalGst=0;
@@ -30,13 +31,16 @@ exports.createBill=catchAsync(async(req,res,next)=>{
     }
     billData.totalBillAmmount=Math.round(billData.final_amount+totalGst);
 
-    let newBillData;
-
+    let newBillData=billData;
+        if(billData.isGST)
          newBillData=await Bill.create(billData);
+        else{
+            billData._id='temp_id'
+        }
     // console.log(newBillData)
     res.status(200).json({
         status:"success",
-        billData:newBillData
+        data:newBillData
     })
 })
 
@@ -62,7 +66,8 @@ exports.getBillData=catchAsync(async(req,res,next)=>{
 
 exports.getFilterBills=catchAsync(async(req,res,next)=>{
      let query={};
-     let options=req.body;
+     let options=req.body.options;
+     console.log(req.body,)
     // Filter by recipient name
     if (options.recipientName) {
         query['recipient.slug'] = {
@@ -72,7 +77,7 @@ exports.getFilterBills=catchAsync(async(req,res,next)=>{
   
       // Filter by date range
       if (options.startDate && options.endDate) {
-        query.invoiceDate = { $gte:moment(options.startDate, 'DD/MM/YYYY').toDate(), $lte:  moment(options.endDate, 'DD/MM/YYYY').toDate() };
+        query.invoiceDate = { $gte:new Date(options.startDate), $lte:  new Date(options.endDate) };
       }
   
       // Filter by bill number
@@ -87,13 +92,28 @@ exports.getFilterBills=catchAsync(async(req,res,next)=>{
         }
   
       const bills = await Bill.find(query).sort({ isPaid: 1 });
-  
+        console.log(bills)
         res.status(200).json({
             totalBills:bills.length,
-            bills
+            data:bills
         }) 
 })
+// exports.getBillsByDateRange=catchAsync(async(req,res,next)=>{
+//     const{startDate,endDate}=req.body;
+//     const salesData = await Invoice.aggregate([
+//         {
+//             $match: {
+//                 invoiceDate: {
+//                     $gte: new Date(startDate),
+//                     $lte: new Date(endDate)
+//                 }
+//             }
+//         }])
 
+//     res.status(200).json({
+//         data:salesData
+//     })
+// })
 exports.getDataByMonths=catchAsync( async (req, res) => {
     const { startDate, endDate } = req.query;
 
@@ -239,6 +259,7 @@ async function  createCompanyInfo(){
 }
 
 async function getBillNo(){
+    console.log(process.env.TYPE)
     let id=process.env.TYPE==="PRODUCTION"?'65a8bfafdfb9d72bd46f3a6f':'65a6a1efa5c99e42c492b67c';
     return await Company.findById(id);
 }

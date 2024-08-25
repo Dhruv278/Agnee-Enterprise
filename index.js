@@ -13,6 +13,7 @@ app.use(cookieparser())
 app.use(bodyParser.json())
 dotenv.config({ path: './config.env' });
 const db = process.env.TYPE === 'PRODUCTION' ? process.env.DATABASE : process.env.DEVDATABASE;
+console.log(db)
 mongoose.connect(db, {
     useNewUrlParser: true,
     useUnifiedTopology: true
@@ -38,14 +39,15 @@ app.get("/api/test",(req,res)=>{
         message:"success"
     })
 })
-if(process.env.TYPE="PRODUCTION"){
+if(process.env.TYPE==="PRODUCTION"){
 
-    app.use(express.static(path.join(__dirname, '/frontend/build')));
+    app.use(express.static(path.join(__dirname, '/dashboard/build')));
     app.get('*', (req, res) => {
     console.log("calling");
-        console.log(__dirname, '/frontend/build')
-        console.log(path.join(__dirname, './frontend/build/index.html'))
-        res.sendFile(path.resolve(__dirname, './frontend/build/index.html'))
+        console.log(__dirname, '/dashboard/build')
+        console.log(path.join(__dirname, './dashboard/build/index.html'))
+        res.sendFile(path.resolve(__dirname, './dashboard/build/index.html'))
+        // res.send("hello")
     })
 
 }
