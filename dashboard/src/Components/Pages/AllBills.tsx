@@ -45,13 +45,13 @@ const BillSummary: React.FC = () => {
   const handleFilter=()=>{
     dispatch(getBillsByDateRangeByAPI({startDate,endDate}));
   }
-  const generateExcel = (bills: Bill[], month: string, year: string) => {
+  const generateExcel = (bills: InvoiceType[], month: string, year: string) => {
     // Calculate the totals
     const totalAmount = bills.reduce((sum, bill) => sum + bill.final_amount, 0);
     const totalBillAmount = bills.reduce((sum, bill) => sum + bill.totalBillAmmount, 0);
   
     // Format the data for Excel
-    const formattedBills = bills.map(bill => ({
+    const formattedBills:any[] = bills.map(bill => ({
       "Bill Date": convertToDDMMYYYY(bill.invoiceDate), // Convert to 'YYYY-MM-DD' format
       "Bill Number": bill.billNo,
       "Recipient Name": bill.recipient.recipientName,
@@ -108,6 +108,7 @@ const BillSummary: React.FC = () => {
 
     if(res &&res.status ===200){
       if(res.data.data.formattedBills.length > 0){
+        setFilteredBills(res.data.data.formattedBills)
           generateExcel(res.data.data.formattedBills,`${new Date(startDate).getMonth()+1}`,`${new Date(startDate).getFullYear()}`)
       }else{
         showErrorToast("No bill founded.")
