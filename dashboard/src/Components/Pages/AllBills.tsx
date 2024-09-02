@@ -6,6 +6,25 @@ import { InvoiceType } from '../../dto/InvoiceType.dto';
 import { useNavigate } from 'react-router-dom';
 import { getHostUrl } from '../../Redux/Actions/getHostURL';
 import { setCurrentInvoice } from '../../Redux/Slices/InvoiceSlice';
+import * as XLSX from 'xlsx';
+import { showErrorToast } from '../Atoms/Toast';
+import axios from 'axios';
+
+interface Bill {
+  invoiceDate: string;
+  billNo: string;
+  recipient: {
+    recipientName: string;
+    recipientGSTNo: string;
+  };
+  final_amount: number;
+  gst: {
+    sgst: number | '';
+    cgst: number | '';
+  };
+  totalBillAmmount: number;
+}
+
 
 
 
@@ -26,11 +45,74 @@ const BillSummary: React.FC = () => {
   const handleFilter=()=>{
     dispatch(getBillsByDateRangeByAPI({startDate,endDate}));
   }
-  const handleGenerateExcelReport=()=>{
+  const generateExcel = (bills: Bill[], month: string, year: string) => {
+    // Calculate the totals
+    const totalAmount = bills.reduce((sum, bill) => sum + bill.final_amount, 0);
+    const totalBillAmount = bills.reduce((sum, bill) => sum + bill.totalBillAmmount, 0);
+  
+    // Format the data for Excel
+    const formattedBills = bills.map(bill => ({
+      "Bill Date": convertToDDMMYYYY(bill.invoiceDate), // Convert to 'YYYY-MM-DD' format
+      "Bill Number": bill.billNo,
+      "Recipient Name": bill.recipient.recipientName,
+      "GST Number": bill.recipient.recipientGSTNo,
+      "Total Amount": bill.final_amount,
+      "SGST Paid": bill.gst.sgst,
+      "CGST Paid": bill.gst.cgst,
+      "Total Bill Amount": bill.totalBillAmmount
+    }));
+  
+    // Add the summary row at the end
+    formattedBills.push({
+      "Bill Date": "TOTAL",
+      "Bill Number": "",
+      "Recipient Name": "",
+      "GST Number": "",
+      "Total Amount": totalAmount,
+      "SGST Paid": "", 
+      "CGST Paid": "",
+      "Total Bill Amount": totalBillAmount
+    });
+  
+    // Create a new workbook and worksheet
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.json_to_sheet(formattedBills);
+  
+    // Append the worksheet to the workbook
+    XLSX.utils.book_append_sheet(wb, ws, "Bills");
+  
+    // Generate a buffer and create a Blob
+    const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+    const data = new Blob([excelBuffer], { type: "application/octet-stream" });
+  
+    // Create a link to download the file
+    const url = URL.createObjectURL(data);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `bills_${month}_${year}.xlsx`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+    
+
+  const handleGenerateExcelReport=async ()=>{
     let month=new Date(startDate).getMonth() +1;
     let year=new Date(startDate).getFullYear();
-    console.log(month,year);
-    window.open(`${getHostUrl()}/api/v1/getBillByMonth?month=${month}&year=${year}`,'_blank',)
+    console.log(startDate,endDate)
+    if(!startDate || !endDate || (new Date(startDate)>new Date(endDate))){
+      showErrorToast("Please provide valid date range to generate Excel file.")
+      return;
+    }
+    const res=await axios.post(`${getHostUrl()}/api/v1/getBillByMonthJson`,{startBodyDate:startDate,endBodyDate:endDate})
+
+    if(res &&res.status ===200){
+      if(res.data.data.formattedBills.length > 0){
+          generateExcel(res.data.data.formattedBills,`${new Date(startDate).getMonth()+1}`,`${new Date(startDate).getFullYear()}`)
+      }else{
+        showErrorToast("No bill founded.")
+      }
+    }
   }
   const handleShowInvoice=(invoice:InvoiceType)=>{
     dispatch(setCurrentInvoice(invoice));
