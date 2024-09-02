@@ -9,14 +9,14 @@ const fs = require('fs');
 exports.createBill=catchAsync(async(req,res,next)=>{
     const billData=req.body;
     var final_amount=0;
-    console.log(req.body)
+    // // console.log(req.body)
     billData.recipient.slug=createSlug(billData.recipient.recipientName);
     billData.products.forEach((product)=>{
         final_amount=final_amount+parseFloat(product.total_amount);
     })
     billData.final_amount=parseFloat(final_amount.toFixed(2));
     let companyData=await getBillNo();
-    console.log(companyData)
+    // // console.log(companyData)
     billData.HSN=companyData.HSN
     billData.isPaid=billData.isPaid ? billData.isPaid : true;
     let totalGst=0;
@@ -27,7 +27,7 @@ exports.createBill=catchAsync(async(req,res,next)=>{
         billData.gst.cgst=(billData.final_amount*(0.09)).toFixed(2);
          totalGst=parseFloat(billData.gst.sgst)+parseFloat(billData.gst.cgst);
         await IncreaseBillNumber(companyData.billNo + 1);
-        // console.log("total GST",totalGst);
+        // // console.log("total GST",totalGst);
     }
     billData.totalBillAmmount=Math.round(billData.final_amount+totalGst);
 
@@ -37,7 +37,7 @@ exports.createBill=catchAsync(async(req,res,next)=>{
         else{
             billData._id='temp_id'
         }
-    // console.log(newBillData)
+    // // console.log(newBillData)
     res.status(200).json({
         status:"success",
         data:newBillData
@@ -49,13 +49,13 @@ exports.getBillData=catchAsync(async(req,res,next)=>{
     const billId=req.params.id;
     // await createCompanyInfo();
     const billData=await Bill.findById(billId);
-    console.log(req.query);
+    // console.log(req.query);
     if(!billData)return next(new ErrorFormate('Invalid bill id',500));
     if(!billData.isGST){
-        console.log(billData)
+        // console.log(billData)
         const deletData=await Bill.findByIdAndDelete(billData._id);
     }
-    console.log(billData)
+    // console.log(billData)
     res.status(200).json({
         billData,
         status:'success',
@@ -67,7 +67,7 @@ exports.getBillData=catchAsync(async(req,res,next)=>{
 exports.getFilterBills=catchAsync(async(req,res,next)=>{
      let query={};
      let options=req.body.options;
-     console.log(req.body,)
+     // console.log(req.body,)
     // Filter by recipient name
     if (options.recipientName) {
         query['recipient.slug'] = {
@@ -92,7 +92,7 @@ exports.getFilterBills=catchAsync(async(req,res,next)=>{
         }
   
       const bills = await Bill.find(query).sort({ isPaid: 1 });
-        console.log(bills)
+        // console.log(bills)
         res.status(200).json({
             totalBills:bills.length,
             data:bills
@@ -152,7 +152,7 @@ exports.getDataByMonths=catchAsync( async (req, res) => {
             Month: `${monthNames[item._id.month - 1]}/${item._id.year}`,
             TotalSales: item.totalSales
         }));
-        console.log(formattedData)
+        // console.log(formattedData)
         // Create a new workbook and worksheet
         const wb = XLSX.utils.book_new();
         const ws = XLSX.utils.json_to_sheet(formattedData);
@@ -196,7 +196,7 @@ exports.getBillByMonth=catchAsync(async (req, res) => {
                 $lte: endDate
             }
         }).select('invoiceDate billNo recipient recipient final_amount gst.sgst gst.cgst totalBillAmmount');
-        console.log(bills)
+        // console.log(bills)
         // Calculate the totals
         const totalAmount = bills.reduce((sum, bill) => sum + bill.final_amount, 0);
         const totalBillAmount = bills.reduce((sum, bill) => sum + bill.totalBillAmmount, 0);
@@ -268,7 +268,7 @@ exports.getBillByMonthJson=catchAsync(async (req, res) => {
                 $lte: endDate
             }
         }).select('invoiceDate billNo recipient recipient final_amount gst.sgst gst.cgst totalBillAmmount');
-        // console.log(bills)
+        //  console.log(bills)
         // Calculate the totals
         // const totalAmount = bills.reduce((sum, bill) => sum + bill.final_amount, 0);
         // const totalBillAmount = bills.reduce((sum, bill) => sum + bill.totalBillAmmount, 0);
@@ -313,7 +313,7 @@ async function  createCompanyInfo(){
 }
 
 async function getBillNo(){
-    console.log(process.env.TYPE)
+    // console.log(process.env.TYPE)
     let id=process.env.TYPE==="PRODUCTION"?'65a8bfafdfb9d72bd46f3a6f':'65a6a1efa5c99e42c492b67c';
     return await Company.findById(id);
 }
