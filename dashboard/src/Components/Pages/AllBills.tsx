@@ -1,132 +1,136 @@
-import React, { useEffect, useState } from 'react';
-import styled from 'styled-components';
-import { useAppDispatch, useAppSelector } from '../../Redux/hook';
-import { generateExcelReport, getBillsByDateRangeByAPI } from '../../Redux/Actions/InvoiceAPI';
-import { InvoiceType } from '../../dto/InvoiceType.dto';
-import { useNavigate } from 'react-router-dom';
-import { getHostUrl } from '../../Redux/Actions/getHostURL';
-import { setCurrentInvoice } from '../../Redux/Slices/InvoiceSlice';
-import * as XLSX from 'xlsx';
-import { showErrorToast } from '../Atoms/Toast';
-import axios from 'axios';
-
-interface Bill {
-  invoiceDate: string;
-  billNo: string;
-  recipient: {
-    recipientName: string;
-    recipientGSTNo: string;
-  };
-  final_amount: number;
-  gst: {
-    sgst: number | '';
-    cgst: number | '';
-  };
-  totalBillAmmount: number;
-}
-
-
-
+import React, { useEffect, useState } from "react";
+import styled from "styled-components";
+import { useAppDispatch, useAppSelector } from "../../Redux/hook";
+import { getBillsByDateRangeByAPI } from "../../Redux/Actions/InvoiceAPI";
+import { InvoiceType } from "../../dto/InvoiceType.dto";
+import { useNavigate } from "react-router-dom";
+import { getHostUrl } from "../../Redux/Actions/getHostURL";
+import { setCurrentInvoice } from "../../Redux/Slices/InvoiceSlice";
+import * as XLSX from "xlsx";
+import { showErrorToast, showSuccessToast } from "../Atoms/Toast";
+import axios from "axios";
 
 const BillSummary: React.FC = () => {
-  const [startDate, setStartDate] = useState<string>('');
-  const navigate=useNavigate();
-  const [endDate, setEndDate] = useState<string>('');
+  const [startDate, setStartDate] = useState<string>("");
+  const [endDate, setEndDate] = useState<string>("");
+  const [isGST, setIsGST] = useState<string>("");
   const [filteredBills, setFilteredBills] = useState<InvoiceType[]>([]);
-  const dispatch=useAppDispatch()
-  const {invoices}=useAppSelector(state=>state.invoice)
-  useEffect(()=>{
-    if(invoices.length>0)
-    setFilteredBills(invoices);
-    else
-    setFilteredBills([])
-  },[invoices])
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const { invoices } = useAppSelector((state) => state.invoice);
 
-  const handleFilter=()=>{
-    dispatch(getBillsByDateRangeByAPI({startDate,endDate}));
-  }
-  const generateExcel = (bills: Bill[], month: string, year: string) => {
-    // Calculate the totals
+  useEffect(() => {
+    if (invoices.length > 0) setFilteredBills(invoices);
+    else setFilteredBills([]);
+  }, [invoices]);
+
+  const handleFilter = () => {
+    dispatch(
+      getBillsByDateRangeByAPI({
+        startDate,
+        endDate,
+        isGst: isGST === "false" ? false : true,
+      })
+    );
+  };
+
+  const handleShowInvoice = (invoice: InvoiceType) => {
+    dispatch(setCurrentInvoice(invoice));
+    navigate(`/invoice/${invoice._id}`);
+  };
+
+  const handleDeleteBill = async (billId: string) => {
+    setIsLoading(true);
+    if (isLoading) return;
+    try {
+      await axios.delete(`${getHostUrl()}/api/v1/deleteBill/${billId}`);
+      showSuccessToast("Bill deleted successfully please refresh the page.");
+      // dispatch(removeInvoice(billId));
+    } catch (err) {
+      showErrorToast("Failed to delete bill");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleGenerateExcelReport = async () => {
+    if (!startDate || !endDate || new Date(startDate) > new Date(endDate)) {
+      showErrorToast("Please provide valid date range to generate Excel file.");
+      return;
+    }
+
+    const res = await axios.post(`${getHostUrl()}/api/v1/getBillByMonthJson`, {
+      startBodyDate: startDate,
+      endBodyDate: endDate,
+      isGST: isGST || undefined,
+    });
+
+    if (res && res.status === 200) {
+      if (res.data.data.formattedBills.length > 0) {
+        generateExcel(
+          res.data.data.formattedBills,
+          `${new Date(startDate).getMonth() + 1}`,
+          `${new Date(startDate).getFullYear()}`
+        );
+      } else {
+        showErrorToast("No bills found.");
+      }
+    }
+  };
+
+  const generateExcel = (bills: any[], month: string, year: string) => {
     const totalAmount = bills.reduce((sum, bill) => sum + bill.final_amount, 0);
-    const totalBillAmount = bills.reduce((sum, bill) => sum + bill.totalBillAmmount, 0);
-  
-    // Format the data for Excel
-    const formattedBills = bills.map(bill => ({
-      "Bill Date": convertToDDMMYYYY(bill.invoiceDate), // Convert to 'YYYY-MM-DD' format
+    const totalBillAmount = bills.reduce(
+      (sum, bill) => sum + bill.totalBillAmmount,
+      0
+    );
+
+    const formattedBills = bills.map((bill) => ({
+      "Bill Date": convertToDDMMYYYY(bill.invoiceDate),
       "Bill Number": bill.billNo,
       "Recipient Name": bill.recipient.recipientName,
       "GST Number": bill.recipient.recipientGSTNo,
       "Total Amount": bill.final_amount,
       "SGST Paid": bill.gst.sgst,
       "CGST Paid": bill.gst.cgst,
-      "Total Bill Amount": bill.totalBillAmmount
+      "Total Bill Amount": bill.totalBillAmmount,
     }));
-  
-    // Add the summary row at the end
+
     formattedBills.push({
       "Bill Date": "TOTAL",
       "Bill Number": "",
       "Recipient Name": "",
       "GST Number": "",
       "Total Amount": totalAmount,
-      "SGST Paid": "", 
+      "SGST Paid": "",
       "CGST Paid": "",
-      "Total Bill Amount": totalBillAmount
+      "Total Bill Amount": totalBillAmount,
     });
-  
-    // Create a new workbook and worksheet
+
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.json_to_sheet(formattedBills);
-  
-    // Append the worksheet to the workbook
     XLSX.utils.book_append_sheet(wb, ws, "Bills");
-  
-    // Generate a buffer and create a Blob
-    const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+    const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
     const data = new Blob([excelBuffer], { type: "application/octet-stream" });
-  
-    // Create a link to download the file
+
     const url = URL.createObjectURL(data);
-    const link = document.createElement('a');
+    const link = document.createElement("a");
     link.href = url;
     link.download = `bills_${month}_${year}.xlsx`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
-    
 
-  const handleGenerateExcelReport=async ()=>{
-    let month=new Date(startDate).getMonth() +1;
-    let year=new Date(startDate).getFullYear();
-    console.log(startDate,endDate)
-    if(!startDate || !endDate || (new Date(startDate)>new Date(endDate))){
-      showErrorToast("Please provide valid date range to generate Excel file.")
-      return;
-    }
-    const res=await axios.post(`${getHostUrl()}/api/v1/getBillByMonthJson`,{startBodyDate:startDate,endBodyDate:endDate})
-
-    if(res &&res.status ===200){
-      if(res.data.data.formattedBills.length > 0){
-          generateExcel(res.data.data.formattedBills,`${new Date(startDate).getMonth()+1}`,`${new Date(startDate).getFullYear()}`)
-      }else{
-        showErrorToast("No bill founded.")
-      }
-    }
-  }
-  const handleShowInvoice=(invoice:InvoiceType)=>{
-    dispatch(setCurrentInvoice(invoice));
-    navigate(`/invoice/${invoice._id}`)
-  }
   function convertToDDMMYYYY(dateString: string): string {
     const date = new Date(dateString);
-    const day = String(date.getUTCDate()).padStart(2, '0');
-    const month = String(date.getUTCMonth() + 1).padStart(2, '0'); // Months are zero-indexed
+    const day = String(date.getUTCDate()).padStart(2, "0");
+    const month = String(date.getUTCMonth() + 1).padStart(2, "0");
     const year = date.getUTCFullYear();
-    console.log(`${day}/${month}/${year}`)
-  
     return `${day}/${month}/${year}`;
   }
+
   return (
     <Container>
       <FilterSection>
@@ -146,8 +150,18 @@ const BillSummary: React.FC = () => {
             onChange={(e) => setEndDate(e.target.value)}
           />
         </label>
-        <Button onClick={()=>handleFilter()}>Submit</Button>
-        <ExcelButton onClick={()=>handleGenerateExcelReport()}>Generate Excel Report</ExcelButton>
+        <label>
+          GST:
+          <Select value={isGST} onChange={(e) => setIsGST(e.target.value)}>
+            <option value="">All</option>
+            <option value="true">With GST</option>
+            <option value="false">Without GST</option>
+          </Select>
+        </label>
+        <Button onClick={handleFilter}>Apply Filters</Button>
+        <ExcelButton onClick={handleGenerateExcelReport}>
+          Export Excel
+        </ExcelButton>
       </FilterSection>
 
       <TableContainer>
@@ -158,18 +172,25 @@ const BillSummary: React.FC = () => {
               <th>Bill Date</th>
               <th>Recipient Name</th>
               <th>Total Amount</th>
-              <th></th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
             {filteredBills.map((bill) => (
-              <tr key={bill.billNo}>
+              <tr key={bill._id}>
                 <td>{bill.billNo}</td>
                 <td>{convertToDDMMYYYY(bill.invoiceDate)}</td>
                 <td>{bill.recipient.recipientName}</td>
                 <td>{bill.totalBillAmmount.toFixed(2)}</td>
                 <td>
-                <Button onClick={()=>handleShowInvoice(bill)}>Show</Button>
+                  <ActionGroup>
+                    <Button onClick={() => handleShowInvoice(bill)}>
+                      Show
+                    </Button>
+                    <DeleteButton onClick={() => handleDeleteBill(bill._id)}>
+                      Delete
+                    </DeleteButton>
+                  </ActionGroup>
                 </td>
               </tr>
             ))}
@@ -181,32 +202,39 @@ const BillSummary: React.FC = () => {
 };
 
 export default BillSummary;
+
+// Styled Components
 const Container = styled.div`
-  max-width: 800px;
+  max-width: 1000px;
   margin: 20px auto;
   padding: 20px;
-  background-color: #f8f9fa;
+  background-color: #ffffff;
   border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
 `;
 
 const FilterSection = styled.div`
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
   margin-bottom: 20px;
-  label {
-    margin-right: 10px;
-    font-weight: bold;
-  }
+  align-items: end;
 `;
 
 const Input = styled.input`
   padding: 8px;
   border-radius: 4px;
   border: 1px solid #ccc;
-  margin-right: 10px;
   font-size: 1rem;
-  margin-left:5px;
+  margin-left: 5px;
+`;
+
+const Select = styled.select`
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  margin-left: 5px;
 `;
 
 const Button = styled.button`
@@ -216,30 +244,28 @@ const Button = styled.button`
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 1rem;
-
+  font-size: 0.9rem;
   &:hover {
     background-color: #0056b3;
   }
 `;
 
-
-const ExcelButton = styled.button`
-  padding: 8px 16px;
+const ExcelButton = styled(Button)`
   background-color: #3e9f3e;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 1rem;
-
   &:hover {
     background-color: #297c29;
   }
 `;
 
+const DeleteButton = styled(Button)`
+  background-color: #e74c3c;
+  &:hover {
+    background-color: #c0392b;
+  }
+`;
+
 const TableContainer = styled.div`
-  max-height: 400px;
+  max-height: 450px;
   overflow-y: auto;
   border: 1px solid #ccc;
   border-radius: 4px;
@@ -249,7 +275,8 @@ const Table = styled.table`
   width: 100%;
   border-collapse: collapse;
 
-  th, td {
+  th,
+  td {
     padding: 12px;
     border: 1px solid #ccc;
     text-align: left;
@@ -257,9 +284,17 @@ const Table = styled.table`
 
   th {
     background-color: #f2f2f2;
+    position: sticky;
+    top: 0;
+    z-index: 1;
   }
 
   tr:nth-child(even) {
-    background-color: #f9f9f9;
+    background-color: #fafafa;
   }
+`;
+
+const ActionGroup = styled.div`
+  display: flex;
+  gap: 8px;
 `;
