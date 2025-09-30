@@ -34,7 +34,7 @@ app.get("/api/v1/getBillData/:id", billController.getBillData);
 app.post("/api/v1/getFilterBillData", billController.getFilterBills);
 app.get("/api/v1/getMonthData", billController.getDataByMonths);
 app.get("/api/v1/getBillByMonth", billController.getBillByMonth);
-app.get("/api/v1/getBillByMonth", billController.getBillByMonth);
+app.post("/api/v1/getBillByMonthJson", billController.getBillByMonthJson);
 app.delete("/api/v1/deleteBill/:id", billController.deleteBill);
 app.get("/api/test", (req, res) => {
   res.status(200).json({

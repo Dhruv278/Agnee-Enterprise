@@ -21,7 +21,7 @@ export const createBillAPI = createAsyncThunk(
 export const getBillsByDateRangeByAPI = createAsyncThunk(
   "invoice/getBillsByDateRangeByAPI",
   async (
-    data: { startDate: string; endDate: string; isGst: boolean },
+    data: { startDate: string; endDate: string; isGst: string },
     { rejectWithValue }
   ) => {
     try {

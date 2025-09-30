@@ -13,7 +13,7 @@ import axios from "axios";
 const BillSummary: React.FC = () => {
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
-  const [isGST, setIsGST] = useState<string>("");
+  const [isGST, setIsGST] = useState<string>("All");
   const [filteredBills, setFilteredBills] = useState<InvoiceType[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const dispatch = useAppDispatch();
@@ -30,7 +30,7 @@ const BillSummary: React.FC = () => {
       getBillsByDateRangeByAPI({
         startDate,
         endDate,
-        isGst: isGST === "false" ? false : true,
+        isGst: isGST === "All" ? "all" : isGST === "false" ? "false" : "true",
       })
     );
   };
@@ -59,7 +59,11 @@ const BillSummary: React.FC = () => {
       showErrorToast("Please provide valid date range to generate Excel file.");
       return;
     }
-
+    console.log("isGST", isGST);
+    if (isGST === "All") {
+      showErrorToast("Please select GST filter to generate Excel file.");
+      return;
+    }
     const res = await axios.post(`${getHostUrl()}/api/v1/getBillByMonthJson`, {
       startBodyDate: startDate,
       endBodyDate: endDate,
@@ -153,7 +157,7 @@ const BillSummary: React.FC = () => {
         <label>
           GST:
           <Select value={isGST} onChange={(e) => setIsGST(e.target.value)}>
-            <option value="">All</option>
+            <option value="All">All</option>
             <option value="true">With GST</option>
             <option value="false">Without GST</option>
           </Select>

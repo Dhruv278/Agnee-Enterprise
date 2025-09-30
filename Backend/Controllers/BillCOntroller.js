@@ -87,8 +87,8 @@ exports.getFilterBills = catchAsync(async (req, res, next) => {
     query = {};
     query.billNo = options.billNo;
   }
-  if (options.isGst !== undefined) {
-    query.isGST = options.isGst;
+  if (options.isGst !== undefined && options.isGst !== "all") {
+    query.isGST = options.isGst === "true" ? true : false;
   }
 
   const bills = await Bill.find(query).sort({ isPaid: 1 });
@@ -276,13 +276,17 @@ exports.getBillByMonthJson = catchAsync(async (req, res) => {
     const endDate = new Date(endBodyDate);
 
     // Query to find all invoices within the specified month
-    const bills = await Bill.find({
+    const query = {
       invoiceDate: {
         $gte: startDate,
         $lte: endDate,
-        isGST: isGST,
       },
-    }).select(
+    };
+
+    if (typeof isGST !== "undefined") {
+      query.isGST = isGST;
+    }
+    const bills = await Bill.find(query).select(
       "invoiceDate billNo recipient recipient final_amount gst.sgst gst.cgst totalBillAmmount"
     );
     //  console.log(bills)
